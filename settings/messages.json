@@ -1,0 +1,10 @@
+{
+    "welcome": [
+        "Hey! How can I help you today?",
+        "Hiya, what can I do for you?"
+    ],
+    "no answer": [
+        "Sorry, I can't answer that right now",
+        "I don't know that one..."
+    ]
+}

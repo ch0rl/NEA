@@ -1,3 +1,18 @@
+# Boring directories
 .idea
 .vscode
 venv/
+__pycache__/
+
+# Imports
+__init__.py
+
+# My notes
+notes.txt
+
+# Confidential logs - all but examples
+logs/*
+!logs/*.example*
+
+# Confidential keys
+settings/api-keys.json
