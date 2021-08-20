@@ -20,19 +20,18 @@ except ImportError as e:
     quit()
 
 
-# Type hint aliases
-NumberOrNone = TypeVar("NumberOrNone", int, float, None)
-
 class Calculator():
     OPERATORS = ["+", "-", "*", "/"]
     # PRECEDENCES used in evaluation
     PRECEDENCES = {"*": 2, "/": 2, "+": 1, "-": 1}
     # Allowed chars (regex format)
     CHARS = r"+-\/\*\()\."
+    # To avoid quitting on math errors
+    ERROR = ArithmeticError
 
     def __init__(self):
         logInfo("Calculator", "Calculator started")
-        self.last_output: NumberOrNone = None
+        self.last_output: str = None
 
     def validate(self, expression: str) -> bool:
         """Validates whether `expression` is likely a numerical expression
@@ -44,7 +43,7 @@ class Calculator():
         # Check for numbers and allowed chars
         return bool(re.match(fr"^[0-9{Calculator.CHARS}\s]+$", expression))
 
-    def parse(self, expression: str) -> NumberOrNone:
+    def parse(self, expression: str) -> str:
         """Parse an expression
         
         :param expression: The expression itself
@@ -70,7 +69,11 @@ class Calculator():
                         val2, val1 = values.pop(), values.pop()
                         op = ops.pop()
 
-                        values.push(eval(f"{val1} {op} {val2}"))
+                        try:
+                            values.push(eval(f"{val1} {op} {val2}"))
+                        except ArithmeticError as e:
+                            logException("Calculator", e)
+                            return None
                     ops.pop()
                 elif token.isnumeric():
                     # Make base-10 number in string
@@ -85,8 +88,11 @@ class Calculator():
                     while len(ops) and Calculator.PRECEDENCES[ops.peek()] > Calculator.PRECEDENCES[token]:
                         val2, val1 = values.pop(), values.pop()
                         op = ops.pop()
-
-                        values.push(eval(f"{val1} {op} {val2}"))
+                        try:
+                            values.push(eval(f"{val1} {op} {val2}"))
+                        except ArithmeticError as e:
+                            logException("Calculator", e)
+                            return None
                     ops.push(token)
                 i += 1
             
@@ -95,9 +101,13 @@ class Calculator():
                 val2, val1 = values.pop(), values.pop()
                 op = ops.pop()
 
-                values.push(eval(f"{val1} {op} {val2}"))
+                try:
+                    values.push(eval(f"{val1} {op} {val2}"))
+                except ArithmeticError as e:
+                    logException("Calculator", e)
+                    return None
             
-            ans = values.pop()
+            ans = str(values.pop())
             self.last_output = ans
             return ans
 
@@ -126,7 +136,7 @@ class Calculator():
                     if resp.status_code == 200:
                         # 200 = All good
                         logInfo("Calculator", "Wolfram|Alpha used")
-                        ans = float(resp.text)
+                        ans = resp.text
                         self.last_output = ans
                         return ans
                         
