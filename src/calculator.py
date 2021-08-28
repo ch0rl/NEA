@@ -8,7 +8,6 @@ from .structures import Stack
 # Builtins
 import re
 import json
-from typing import TypeVar
 
 # Not builtin
 try:
