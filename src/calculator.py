@@ -19,7 +19,7 @@ except ImportError as e:
     quit()
 
 
-class Calculator():
+class Calculator:
     OPERATORS = ["+", "-", "*", "/"]
     # PRECEDENCES used in evaluation
     PRECEDENCES = {"*": 2, "/": 2, "+": 1, "-": 1}

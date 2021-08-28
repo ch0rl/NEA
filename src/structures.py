@@ -3,7 +3,7 @@
 from typing import Any, Optional
 
 
-class Queue():
+class Queue:
     def __init__(self, items: Optional[list] = None):
         """Standard FIFO Queue
         :param items: Items (in order) to enqueue
@@ -31,7 +31,7 @@ class Queue():
         return len(self.list)
 
 
-class Stack():
+class Stack:
     def __init__(self, items: Optional[list] = None):
         """Standard FILO Stack
         :param items: Items (in order) to push
