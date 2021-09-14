@@ -2,7 +2,7 @@
 
 
 # My functions
-from .helpers import *
+from ..helpers import *
 from .structures import Stack
 
 # Builtins
@@ -32,7 +32,8 @@ class Calculator:
         logInfo("Calculator", "Calculator started")
         self.last_output: str = None
 
-    def validate(self, expression: str) -> bool:
+    @staticmethod
+    def validate(expression: str) -> bool:
         """Validates whether `expression` is likely a numerical expression
         
         :param expression: The expression to validate

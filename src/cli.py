@@ -2,7 +2,9 @@
 
 
 # My functions
-from .calculator import Calculator
+import requests
+from .classes.calculator import Calculator
+from .classes.weather import Weather
 from .helpers import logInfo
 
 # Builtins
@@ -14,6 +16,7 @@ logInfo("Main", "CLI Started")
 
 # Setup objects
 calc = Calculator()
+weather = Weather()
 
 # Get lists of messages
 with open("settings/messages.json", 'r') as f:
@@ -39,6 +42,21 @@ while running:
         # If ans isn't None
         if ans is not None:
             print(f"Answer: {ans}")
+        else:
+            print(random.choice(MESSAGES["no answer"]))
+        
+        # Newline
+        print()
+
+    elif command == "weather":
+        location = input("Location: ").lower()
+        print(f"You said: 'What is the weather like at/in {location}'")
+        # Fetch weather
+        response = weather.weather(location)
+
+        # If weather is returned
+        if weather is not None:
+            print(response)
         else:
             print(random.choice(MESSAGES["no answer"]))
         

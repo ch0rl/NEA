@@ -2,7 +2,7 @@
 
 
 # My functions
-from .helpers import *
+from ..helpers import *
 
 # Builtins
 import json
@@ -12,7 +12,7 @@ import re
 try:
     import requests
 except ImportError as e:
-    logException("Calculator", e)
+    logException("Weather", e)
     print("Uninstalled package, try `pip install requests`")
     quit()
 
@@ -29,7 +29,8 @@ class Weather:
         logInfo("Weather", "Weather started")
         self.last_output = None
 
-    def form_nice_string(self, forecast: dict) -> str:
+    @staticmethod
+    def form_nice_string(forecast: dict) -> str:
         """Forms 'nice' (printable) string from the forecast
         
         :param forecast: Raw forecast data from the API
