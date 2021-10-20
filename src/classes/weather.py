@@ -50,9 +50,11 @@ class Weather:
             return None
         else:
             # All data fetched
-            return f"""Weather in {location} at {last_updated[1]}
-                It is currently {temp} degrees, with wind speeds of {wind_speed}
-                The weather is generally {condition}"""
+            return (
+                f"Weather in {location} at {last_updated[1]}\n"
+                f"It is currently {temp} degrees, with wind speeds of {wind_speed}\n"
+                f"The weather is generally {condition}\n"
+            )
     
     def weather(self, location: str = None) -> str:
         """Get weather forecast at location, over `days`

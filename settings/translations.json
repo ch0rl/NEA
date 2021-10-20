@@ -1,0 +1,20 @@
+{
+    "command": {
+        "calculator": ["plus", "add", "minus", "subtract", "times", "multiplied by", "over", "divided by", "+", "-", "/", "*"],
+        "weather": ["weather", "forecast"],
+        "speech": ["speech"]
+    },
+    "data": {
+        "plus": "+",
+        "add": "+",
+        "minus": "-",
+        "subtract": "-",
+        "times": "*",
+        "multiplied by": "*",
+        "over": "/",
+        "divided by": "/",
+        "what is": "",
+        "weather": "",
+        "in": ""
+    }
+}

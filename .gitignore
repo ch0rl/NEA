@@ -4,8 +4,8 @@
 venv/
 __pycache__/
 
-# Imports
-__init__.py
+# Python
+pyvenv.cfg
 
 # My notes
 notes.txt
