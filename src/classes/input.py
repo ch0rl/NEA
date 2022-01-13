@@ -1,8 +1,9 @@
 """Base class for speech recognition and translation"""
 
 # My functions
-from os import replace
 import threading
+
+from speech_recognition import Recognizer
 from ..helpers import *
 
 # Builtin
@@ -64,7 +65,74 @@ class Text_Input_Handler:
         self.commands = self.translations["command"]
         self.data = self.translations["data"]
     
-    def __parse_raw_text(self, raw_str: str) -> dict:
+    def parse_raw_text(self, raw_str: str) -> dict:
+        """Parses text to return useable data
+        
+        :param raw_str: The raw text to parse
+        :return: A dictionary of the function to invoke and data to use, eg:
+                {
+                    "command": "calculator",
+                    "data": "1 + 2"
+                }
+        """
+        text = raw_str.lower()
+
+        predicted_commands = defaultdict(int)
+        for command in self.commands:
+            for c in self.commands[command]:
+                if c in text:
+                    predicted_commands[command] += 1
+
+        predicted_command = ("", float("-inf"))
+        for c in predicted_commands:
+            if predicted_commands[c] > predicted_command[1]:
+                predicted_command = (c, predicted_commands[c])
+
+        for d in self.data:
+            text = text.replace(d, self.data[d])
+
+        return {"command": predicted_command[0], "data": text}
+    
+    def get_input(self, kb_handler: Keyboard_Handler) -> dict:
+        """Gets and interprets text input
+        
+        :param commands: The available commands in the system
+        :return: Dictionary of prediction, eg:
+                {
+                    "command": "calculator",
+                    "data": "1 + 2"
+                }
+        """
+        text = kb_handler.access_text()
+        parsed = self.parse_raw_text(text)
+
+        return parsed
+
+
+class Speech_Input_Handler:
+    """Class for handling speech input"""
+    def __init__(self):
+        logInfo("Speech Input", "Speech Input started")
+        self.recognizer = sr.Recognizer()
+        with open("settings\\translations.json") as f:
+            self.translations = json.load(f)
+        
+        self.commands = self.translations["command"]
+        self.data = self.translations["data"]
+
+    def __parse_audio(self, audio: sr.AudioData) -> str:
+        """Parse microphone audio, only using sphinx at the moment
+
+        :param audio: The AudioData from the microphone
+        :return: The raw data from the recognizer
+        """
+        try:
+            return self.recognizer.recognize_google(self.audio)
+        except sr.UnknownValueError or sr.RequestError as e:
+            logException("Speech Input", e)
+            return None
+
+    def __parse_raw(self, raw_str: str) -> dict:
         """Parses text to return useable data
         
         :param raw_str: The raw text to parse
@@ -91,69 +159,10 @@ class Text_Input_Handler:
             text = text.replace(d, self.data[d])
 
         return {"command": predicted_command[0], "data": text.replace(" ", "")}
-    
-    def get_input(self, kb_handler: Keyboard_Handler) -> dict:
-        """Gets and interprets text input
-        
-        :param commands: The available commands in the system
-        :return: Dictionary of prediction, eg:
-                {
-                    "command": "calculator",
-                    "data": "1 + 2"
-                }
-        """
-        text = kb_handler.access_text()
-        parsed = self.__parse_raw_text(text)
 
-        return parsed
-
-
-class Speech_Input_Handler:
-    """Class for handling speech input"""
-    def __init__(self):
-        logInfo("Speech Input", "Speech Input started")
-        self.recognizer = sr.Recognizer()
-        with open("settings\\translations.json") as f:
-            self.translations = json.load(f)
-
-    def __parse_audio(self, audio: sr.AudioData) -> str:
-        """Parse microphone audio, only using sphinx at the moment
-
-        :param audio: The AudioData from the microphone
-        :return: The raw data from the recognizer
-        """
-        try:
-            return self.recognizer.recognize_sphinx(audio)
-        except sr.UnknownValueError or sr.RequestError as e:
-            logException("Speech Input", e)
-            return None
-
-    def __parse_raw(self, raw_str: str) -> dict:
-        """Parses text to return useable data
-        
-        :param raw_str: The raw text to parse
-        :return: A dictionary of the function to invoke and data to use, eg:
-                {
-                    "command": "calculator",
-                    "data": "1 + 2"
-                }
-        """
-        text = raw_str.lower()
-
-        predicted_commands = []
-        for command in self.translations["command"]:
-            for t in text:
-                if t in text:
-                    predicted_commands.append(command)
-        predicted_command = max(
-                map(lambda x: predicted_commands.count(x), predicted_commands)
-            )
-        
-        for data in self.translations["data"]:
-            for d in data:
-                text = text.replace(d, data[d])
-        
-        return {"command": predicted_command, "data": data.replace(" ", "")}
+    def __get_audio(self):
+        with sr.Microphone(device_index=1) as source:
+            self.audio = self.recognizer.listen(source)
 
     def get_input(self) -> dict:
         """Gets and interprets microphone input
@@ -166,11 +175,11 @@ class Speech_Input_Handler:
                 }
         """
         # Listen to user
-        with sr.Microphone() as source:
-            audio = self.recognizer.listen(source)
+        with sr.Microphone(device_index=1) as source:
+            self.audio = self.recognizer.listen(source)
 
         # Recognize
-        raw_data = self.__parse_audio(audio)
+        raw_data = self.__parse_audio()
         if raw_data is None:
             return None
         

@@ -1,6 +1,6 @@
 {
     "command": {
-        "calculator": ["plus", "add", "minus", "subtract", "times", "multiplied by", "over", "divided by", "+", "-", "/", "*"],
+        "calculator": ["calculate", "plus", "add", "minus", "subtract", "times", "multiplied by", "over", "divided by", "+", "-", "/", "*"],
         "weather": ["weather", "forecast"],
         "speech": ["speech"]
     },
@@ -10,11 +10,26 @@
         "minus": "-",
         "subtract": "-",
         "times": "*",
+        "x": "*",
         "multiplied by": "*",
         "over": "/",
         "divided by": "/",
         "what is": "",
         "weather": "",
         "in": ""
+    },
+    "speech specific": {
+        "one": "1",
+        "two": "2",
+        "three": "3",
+        "four": "4",
+        "five": "5",
+        "six": "6",
+        "seven": "7",
+        "eight": "8",
+        "nine": "9",
+        "ten": "10",
+        "whether": "weather",
+        "wether": "weather"
     }
 }

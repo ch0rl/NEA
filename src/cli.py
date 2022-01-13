@@ -39,6 +39,7 @@ while running:
         # TODO: Improve
         if command == "speech":
             input_ = speech_input.get_input()
+            print(f"You said: {input_}")
             command, data = input_["command"], input_["data"]
 
         if command == "calculator":

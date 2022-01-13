@@ -22,7 +22,7 @@ except ImportError as e:
 class Calculator:
     OPERATORS = ["+", "-", "*", "/"]
     # PRECEDENCES used in evaluation
-    PRECEDENCES = {"*": 2, "/": 2, "+": 1, "-": 1}
+    PRECEDENCES = {"*": 2, "/": 2, "+": 1, "-": 1, "(": 0, ")": 0}
     # Allowed chars (regex format)
     CHARS = r"+-\/\*\()\."
     # To avoid quitting on math errors
