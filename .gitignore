@@ -16,3 +16,4 @@ logs/*
 
 # Confidential keys
 settings/api-keys.json
+server/discord_bot/vars.json
