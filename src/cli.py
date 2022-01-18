@@ -52,7 +52,7 @@ while running:
                 print(f"Answer: {ans}")
             else:
                 print(random.choice(MESSAGES["no answer"]))
-            
+
             # Newline
             print()
 
@@ -66,7 +66,7 @@ while running:
                 print(response)
             else:
                 print(random.choice(MESSAGES["no answer"]))
-            
+
             # Newline
             print()
 

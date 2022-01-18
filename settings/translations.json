@@ -2,7 +2,8 @@
     "command": {
         "calculator": ["calculate", "plus", "add", "minus", "subtract", "times", "multiplied by", "over", "divided by", "+", "-", "/", "*"],
         "weather": ["weather", "forecast"],
-        "speech": ["speech"]
+        "speech": ["speech"],
+        "discord": ["discord", "messages"]
     },
     "data": {
         "plus": "+",

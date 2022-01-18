@@ -1,13 +1,11 @@
 """Base class for speech recognition and translation"""
 
 # My functions
-import threading
-
-from speech_recognition import Recognizer
 from ..helpers import *
 
 # Builtin
 import json
+import threading
 from collections import defaultdict
 
 # Not builtin
@@ -70,10 +68,10 @@ class Text_Input_Handler:
         
         :param raw_str: The raw text to parse
         :return: A dictionary of the function to invoke and data to use, eg:
-                {
-                    "command": "calculator",
-                    "data": "1 + 2"
-                }
+            {
+                "command": "calculator",
+                "data": "1 + 2"
+            }
         """
         text = raw_str.lower()
 
@@ -98,10 +96,10 @@ class Text_Input_Handler:
         
         :param commands: The available commands in the system
         :return: Dictionary of prediction, eg:
-                {
-                    "command": "calculator",
-                    "data": "1 + 2"
-                }
+            {
+                "command": "calculator",
+                "data": "1 + 2"
+            }
         """
         text = kb_handler.access_text()
         parsed = self.parse_raw_text(text)
@@ -120,29 +118,36 @@ class Speech_Input_Handler:
         self.commands = self.translations["command"]
         self.data = self.translations["data"]
 
-    def __parse_audio(self, audio: sr.AudioData) -> str:
-        """Parse microphone audio, only using sphinx at the moment
+    def listen(self, timeout: int = 2) -> sr.AudioData:
+        """Listen for audio
+        
+        :param timeout: Seconds of 'dead time' to wait for audio
+        :return: Raw audio data recorded
+        """
+        with sr.Microphone(device_index=3) as source:
+            try:
+                return self.recognizer.listen(source, timeout=timeout)
+            except sr.WaitTimeoutError as e:
+                logError("Speech Input", "No Audio Captured", f"Recognizer failed to capture any audio and timed out: {e}")
+                return None
 
-        :param audio: The AudioData from the microphone
-        :return: The raw data from the recognizer
+    def parse_raw_audio(self, raw_audio: sr.AudioData) -> dict:
+        """Parses raw audio and return useful data
+        
+        :param raw_audio: The raw audio to parse
+        :return: A dictionary of the function to invoke and data to use, eg:
+            {
+                "command": "calculator",
+                "data": "1 + 2"
+            }
         """
         try:
-            return self.recognizer.recognize_google(self.audio)
+            text = self.recognizer.recognize_google(raw_audio)
         except sr.UnknownValueError or sr.RequestError as e:
             logException("Speech Input", e)
             return None
-
-    def __parse_raw(self, raw_str: str) -> dict:
-        """Parses text to return useable data
         
-        :param raw_str: The raw text to parse
-        :return: A dictionary of the function to invoke and data to use, eg:
-                {
-                    "command": "calculator",
-                    "data": "1 + 2"
-                }
-        """
-        text = raw_str.lower()
+        text = text.lower()
 
         predicted_commands = defaultdict(int)
         for command in self.commands:
@@ -159,31 +164,3 @@ class Speech_Input_Handler:
             text = text.replace(d, self.data[d])
 
         return {"command": predicted_command[0], "data": text.replace(" ", "")}
-
-    def __get_audio(self):
-        with sr.Microphone(device_index=1) as source:
-            self.audio = self.recognizer.listen(source)
-
-    def get_input(self) -> dict:
-        """Gets and interprets microphone input
-        
-        :param commands: The available commands in the system
-        :return: Dictionary of prediction, eg:
-                {
-                    "command": "calculator",
-                    "data": "1 + 2"
-                }
-        """
-        # Listen to user
-        with sr.Microphone(device_index=1) as source:
-            self.audio = self.recognizer.listen(source)
-
-        # Recognize
-        raw_data = self.__parse_audio()
-        if raw_data is None:
-            return None
-        
-        # Parse
-        parsed = self.__parse_raw(raw_data)
-
-        return parsed

@@ -13,7 +13,6 @@ def logInfo(source: str, msg: str):
 
     :param source: Where the message came from (ie., Calculator)
     :param msg: Message to log (ie., Process started)
-    :param path: Path to the log file
     """
 
     with open("logs\info.log", 'a') as f:
@@ -39,7 +38,6 @@ def logException(source: str, e: Exception):
 
     :param source: Where the error came from (ie., Calculator)
     :param e: The `Exception` object
-    :param path: Path to the log file
     """
 
     with open("logs\exceptions.log", 'a') as f:
