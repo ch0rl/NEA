@@ -43,10 +43,11 @@ class Calculator:
         # Check for numbers and allowed chars
         return bool(re.match(fr"^[0-9{Calculator.CHARS}\s]+$", expression))
 
-    def parse(self, expression: str) -> str:
+    def parse(self, expression: str, internet: bool = False) -> str:
         """Parse an expression
         
         :param expression: The expression itself
+        :param internet: Whether or not a connection to the internet exists
         :return: Result of expression, None if not calculable
         """
 
@@ -111,7 +112,7 @@ class Calculator:
             self.last_output = ans
             return ans
 
-        else:
+        elif internet:
             # Not validated so try Wolfram Alpha
             with open("settings/api-keys.json", 'r') as f:
                 try:
@@ -123,24 +124,19 @@ class Calculator:
             # Have to have API key for this to work
             if key:
                 urlEncoded = parse.quote(expression, safe="")
-                
-                try:
-                    resp = requests.get(
-                        f"http://api.wolframalpha.com/v1/result?appid={key}&i={urlEncoded}"
-                    )
-                except requests.exceptions.ConnectionError as e:
-                    # Not connected
-                    logException("Calculator", e)
-                    return None
+                resp = requests.get(
+                    f"http://api.wolframalpha.com/v1/result?appid={key}&i={urlEncoded}"
+                )
+                if resp.status_code == 200:
+                    # 200 = All good
+                    logInfo("Calculator", "Wolfram|Alpha used")
+                    ans = resp.text
+                    self.last_output = ans
+                    return ans
+                    
                 else:
-                    if resp.status_code == 200:
-                        # 200 = All good
-                        logInfo("Calculator", "Wolfram|Alpha used")
-                        ans = resp.text
-                        self.last_output = ans
-                        return ans
-                        
-                    else:
-                        # Bad status code
-                        logError("Calculator", "Bad API return", "Wolfram|Alpha API returned a non-200 status code")
-                        return None
+                    # Bad status code
+                    logError("Calculator", "Bad API return", "Wolfram|Alpha API returned a non-200 status code")
+                    return None
+        else:
+            logError("Calculator", "Failed to answer", f"Unable to parse expression: {expression} and not connected to the internet")

@@ -61,6 +61,11 @@ class Main_GUI(QtWidgets.QMainWindow, qt_v2.Ui_MainWindow):
         self.messages = messages
         self.server_url, self.server_port = server_info
         self.server_uid = server_uid
+        self.internet = False
+
+        # Start internet checker
+        self.internet_thread = threading.Thread(target=self.__update_connection)
+        self.internet_thread.start()
 
         # Hook buttons
         self.enter_button.clicked.connect(self.__sort_input)
@@ -78,6 +83,16 @@ class Main_GUI(QtWidgets.QMainWindow, qt_v2.Ui_MainWindow):
         )
         self.settings_win.show()
 
+    def __update_connection(self):
+        while True:
+            try:
+                requests.get("http://example.com")
+            except requests.ConnectionError:
+                self.internet = False
+            else:
+                self.internet = True
+            time.sleep(1)
+
     def __sort_input(self):
         """Handles any input"""
         text = self.text_entry.text()
@@ -88,10 +103,13 @@ class Main_GUI(QtWidgets.QMainWindow, qt_v2.Ui_MainWindow):
         if command == "speech":
             self.add_to_output("Listening for audio")
             audio = self.speech_input_handler.listen(10)
-            print(audio)
             if audio is not None:
-                input_ = self.speech_input_handler.parse_raw_audio(audio)
-                command, data = input_["command"], input_["data"]
+                input_ = self.speech_input_handler.parse_raw_audio(audio, not self.internet)
+                if input_ is not None:
+                    command, data = input_["command"], input_["data"]
+                else:
+                    self.add_to_output(random.choice(self.messages["no answer"]))
+                    return
             else:
                 command, data = "", "Audio Not Recognized"
 

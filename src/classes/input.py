@@ -131,7 +131,7 @@ class Speech_Input_Handler:
                 logError("Speech Input", "No Audio Captured", f"Recognizer failed to capture any audio and timed out: {e}")
                 return None
 
-    def parse_raw_audio(self, raw_audio: sr.AudioData) -> dict:
+    def parse_raw_audio(self, raw_audio: sr.AudioData, offline: bool = False) -> dict:
         """Parses raw audio and return useful data
         
         :param raw_audio: The raw audio to parse
@@ -141,8 +141,12 @@ class Speech_Input_Handler:
                 "data": "1 + 2"
             }
         """
+        if offline:
+            r = self.recognizer.recognize_sphinx
+        else:
+            r = self.recognizer.recognize_google
         try:
-            text = self.recognizer.recognize_google(raw_audio)
+            text = r(raw_audio)
         except sr.UnknownValueError or sr.RequestError as e:
             logException("Speech Input", e)
             return None
