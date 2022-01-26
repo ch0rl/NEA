@@ -148,7 +148,7 @@ class Main_GUI(QtWidgets.QMainWindow, qt_v2.Ui_MainWindow):
                 {"u": self.server_uid}
             )
 
-            if resp.status_code == 200:
+            if resp.status_code // 100 != 2:
                 data = resp.json()
                 if data["n"] == 0:
                     self.add_to_output("No new messages")
@@ -211,6 +211,9 @@ class Settings_GUI(QtWidgets.QWidget, settings_v2.Ui_Form):
         self.add_c_button.clicked.connect(self.__add_channel)
         self.remove_c_button.clicked.connect(self.__remove_channel)
 
+        self.sync_trans_append.clicked.connect(lambda: self.__update_translations("a"))
+        self.sync_trans_owrite.clicked.connect(lambda: self.__update_translations("w"))
+
     def __add_welcome(self):
         text = self.text_entry.text()
         with open(self.settings_path+"\\messages.json", "r") as f:
@@ -244,7 +247,7 @@ class Settings_GUI(QtWidgets.QWidget, settings_v2.Ui_Form):
             {"u": self.server_uid, "c": str(id_)}
         )
 
-        if resp.status_code != 200:
+        if resp.status_code // 100 != 2:
             logError("Discord Integration", "Non-200 response", f"Server responded with: {resp.text}")
 
     def __remove_channel(self):
@@ -254,5 +257,41 @@ class Settings_GUI(QtWidgets.QWidget, settings_v2.Ui_Form):
             {"u": self.server_uid, "c": str(id_)}
         )
 
-        if resp.status_code != 200:
+        if resp.status_code // 100 != 2:
             logError("Discord Integration", "Non-200 response", f"Server responded with: {resp.text}")
+    
+    def __update_translations(self, mode: str):
+        with open(self.settings_path+"\\translations.json") as f:
+            translations = json.load(f)
+        ver = translations["version"]
+
+        resp = requests.get(
+            f"http://{self.server_url}:{self.server_port}/sync_rules",
+            {"v": str(ver)}
+        )
+
+        if resp.status_code // 100 != 2:
+            logError("Translation Sync", "Non-200 response", f"Server responded with: {resp.text}")
+        elif resp.status_code == 204:
+            # Already up-to-date
+            pass
+        else:
+            new_translations = resp.json()
+            if mode == "w":
+                with open(self.settings_path+"\\translations.json", "w") as f:
+                    json.dump(new_translations, f)
+            else:
+                for k in ("command", "data", "speech specific"):
+                    for k_, v in new_translations[k].items():
+                        if (
+                                k_ in translations[k] and
+                                type(translations[k][k_]) == list
+                            ):
+                            translations[k][k_].extend(
+                                [i for i in v if i not in translations[k][k_]]
+                            )
+                        elif k_ not in translations[k]:
+                            translations[k][k_] = v
+                            
+                with open(self.settings_path+"\\translations.json", "w") as f:
+                    json.dump(translations, f)

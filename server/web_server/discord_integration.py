@@ -26,7 +26,7 @@ def add_channel(request: HttpRequest) -> HttpResponse:
                 with open("discord_bot/vars.json", "w") as f:
                     json.dump(data, f)
 
-                return HttpResponse(f"Added channel {channel} for user {user}")
+                return HttpResponse(f"Added channel {channel} for user {user}", status=201)
     else:
         return HttpResponseBadRequest("Endpoint /add_channel only accepts POST requests")
 

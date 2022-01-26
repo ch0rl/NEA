@@ -17,10 +17,12 @@ from django.contrib import admin
 from django.urls import path
 
 from . import discord_integration as di
+from . import translations
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('add_channel', di.add_channel),
     path('remove_channel', di.remove_channel),
-    path('get_messages', di.get_messages)
+    path('get_messages', di.get_messages),
+    path('sync_rules', translations.sync_rules)
 ]

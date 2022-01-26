@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'settings_v2.ui'
+# Form implementation generated from reading ui file 'src/GUIs/settings_v2.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(482, 489)
+        Form.resize(482, 610)
         self.verticalLayoutWidget = QtWidgets.QWidget(Form)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 461, 121))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
@@ -68,6 +68,18 @@ class Ui_Form(object):
         self.help_2.setGeometry(QtCore.QRect(10, 400, 461, 81))
         self.help_2.setReadOnly(True)
         self.help_2.setObjectName("help_2")
+        self.verticalLayoutWidget_2 = QtWidgets.QWidget(Form)
+        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(10, 490, 461, 111))
+        self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.sync_trans_append = QtWidgets.QPushButton(self.verticalLayoutWidget_2)
+        self.sync_trans_append.setObjectName("sync_trans_append")
+        self.verticalLayout_2.addWidget(self.sync_trans_append)
+        self.sync_trans_owrite = QtWidgets.QPushButton(self.verticalLayoutWidget_2)
+        self.sync_trans_owrite.setObjectName("sync_trans_owrite")
+        self.verticalLayout_2.addWidget(self.sync_trans_owrite)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -102,13 +114,5 @@ class Ui_Form(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Channel ID: ID of the channel to add</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">You will also need to add the bot to your server with this url: &lt;url&gt;</p></body></html>"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Form = QtWidgets.QWidget()
-    ui = Ui_Form()
-    ui.setupUi(Form)
-    Form.show()
-    sys.exit(app.exec_())
+        self.sync_trans_append.setText(_translate("Form", "Sync Translations (append only)"))
+        self.sync_trans_owrite.setText(_translate("Form", "Sync Translations (overwrite)"))
