@@ -4,8 +4,7 @@
         "calculator": ["calculate", "plus", "add", "minus", "subtract", "times", "multiplied by", "over", "divided by", "+", "-", "/", "*"],
         "weather": ["weather", "forecast"],
         "speech": ["speech"],
-        "discord": ["discord", "messages"],
-        "test": "x"
+        "discord": ["discord", "messages"]
     },
     "data": {
         "plus": "+",
@@ -19,8 +18,7 @@
         "divided by": "/",
         "what is": "",
         "weather": "",
-        "in": "",
-        "server-test": "test"
+        "in": ""
     },
     "speech specific": {
         "one": "1",

@@ -1,13 +1,1 @@
-{
-    "welcome": [
-        "Hey! How can I help you today?",
-        "Hiya, what can I do for you?",
-        "Hi, how can I help?",
-        "Test Welcome Message"
-    ],
-    "no answer": [
-        "Sorry, I can't answer that right now",
-        "I don't know that one...",
-        "I can't answer that one"
-    ]
-}
+{ "welcome": ["Hey! How can I help you today?", "Hiya, what can I do for you?", "Hi, how can I help?", "Test Welcome Message"], "no answer": ["Sorry, I can't answer that right now", "I don't know that one...", "I can't answer that one"] }
