@@ -4,6 +4,7 @@
 # My functions
 from ..helpers import *
 from .structures import Stack
+from PyQt5.QtWidgets import QMessageBox
 
 # Builtins
 import re
@@ -74,6 +75,11 @@ class Calculator:
                             values.push(eval(f"{val1} {op} {val2}"))
                         except ArithmeticError as e:
                             logException("Calculator", e)
+                            QMessageBox(
+                                QMessageBox.Icon.Critical,
+                                "Math Error",
+                                f"Cannot parse '{val1} {op} {val2}' due to a math error"
+                            ).exec()
                             return None
                     ops.pop()
                 elif token.isnumeric():
@@ -93,6 +99,11 @@ class Calculator:
                             values.push(eval(f"{val1} {op} {val2}"))
                         except ArithmeticError as e:
                             logException("Calculator", e)
+                            QMessageBox(
+                                QMessageBox.Icon.Critical,
+                                "Math Error",
+                                f"Cannot parse '{val1} {op} {val2}' due to a math error"
+                            ).exec()
                             return None
                     ops.push(token)
                 i += 1
@@ -106,6 +117,11 @@ class Calculator:
                     values.push(eval(f"{val1} {op} {val2}"))
                 except ArithmeticError as e:
                     logException("Calculator", e)
+                    QMessageBox(
+                        QMessageBox.Icon.Critical,
+                        "Math Error",
+                        f"Cannot parse '{val1} {op} {val2}' due to a math error"
+                    ).exec()
                     return None
             
             ans = str(values.pop())
