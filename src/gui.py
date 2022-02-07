@@ -6,6 +6,7 @@ from .classes.input import *
 from .classes.gui import *
 from .classes.calculator import Calculator
 from .classes.weather import Weather
+from .classes.scripting import Scripting
 from .helpers import *
 
 # Builtins
@@ -28,6 +29,7 @@ calc = Calculator()
 weather = Weather()
 text_input = Text_Input_Handler()
 speech_input = Speech_Input_Handler()
+scripting = Scripting("settings")
 
 # Get lists of messages
 with open("settings/messages.json", 'r') as f:
@@ -41,7 +43,7 @@ with open("settings/server.json", "r") as f:
 APP = Qwidgets.QApplication([])
 MAIN_GUI = Main_GUI(
     random.choice(MESSAGES["welcome"]),
-    text_input, speech_input, calc, weather, MESSAGES,
+    text_input, speech_input, calc, weather, MESSAGES, scripting,
     (SERVER_INFO["url"], SERVER_INFO["port"]),
     SERVER_INFO["uid"]
 )

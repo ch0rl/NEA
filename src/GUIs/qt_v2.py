@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'src\GUIs\qt_v2.ui'
+# Form implementation generated from reading ui file 'qt_v2.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -49,7 +49,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.verticalLayout_3.addWidget(self.scrollArea)
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 401, 31))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 401, 50))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -58,6 +58,10 @@ class Ui_MainWindow(object):
         self.welcome_message.setReadOnly(True)
         self.welcome_message.setObjectName("welcome_message")
         self.horizontalLayout.addWidget(self.welcome_message)
+        self.scripting_button = QtWidgets.QToolButton(self.horizontalLayoutWidget)
+        self.scripting_button.setToolTipDuration(-1)
+        self.scripting_button.setObjectName("scripting_button")
+        self.horizontalLayout.addWidget(self.scripting_button)
         self.settings_button = QtWidgets.QToolButton(self.horizontalLayoutWidget)
         self.settings_button.setObjectName("settings_button")
         self.horizontalLayout.addWidget(self.settings_button)
@@ -79,4 +83,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.text_entry.setPlaceholderText(_translate("MainWindow", "Type Here..."))
         self.enter_button.setText(_translate("MainWindow", "Enter"))
+        self.scripting_button.setToolTip(_translate("MainWindow", "Scripting"))
+        self.scripting_button.setText(_translate("MainWindow", "..."))
+        self.settings_button.setToolTip(_translate("MainWindow", "Settings"))
         self.settings_button.setText(_translate("MainWindow", "..."))

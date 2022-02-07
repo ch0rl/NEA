@@ -1,21 +1,24 @@
 """Classes for use in the gui version"""
 
 # Builtins
+import re
 import random
 import requests
 from typing import Tuple
 
 # My functions
 from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 from src.helpers import *
 # For type hints
 from src.classes.input import *
 from src.classes.calculator import Calculator
 from src.classes.weather import Weather
+from src.classes.scripting import Scripting
 
 # Generated gui
 try:
-    from src.GUIs import qt_v2, settings_v2
+    from src.GUIs import qt_v2, settings_v2, scripting_v1
 except ImportError as e:
     logException("GUI Classes", e)
     print("No GUI template file found")
@@ -32,6 +35,7 @@ class Main_GUI(QtWidgets.QMainWindow, qt_v2.Ui_MainWindow):
                  calc: Calculator,
                  weather: Weather,
                  messages: list,
+                 scripting: Scripting,
                  server_info: Tuple[str, int],
                  server_uid: str,
                  *args, **kwargs
@@ -44,6 +48,7 @@ class Main_GUI(QtWidgets.QMainWindow, qt_v2.Ui_MainWindow):
         :param calc: Calculator object in use
         :param weather: Weather object in use
         :param messages: Messages in use
+        :param scripting: Scripting in use
         :param server_info: Access information for the server, in form
             (url, port)
         :param server_uid: `User id` when communicating with the server
@@ -59,6 +64,7 @@ class Main_GUI(QtWidgets.QMainWindow, qt_v2.Ui_MainWindow):
         self.calc = calc
         self.weather = weather
         self.messages = messages
+        self.scripting = scripting
         self.server_url, self.server_port = server_info
         self.server_uid = server_uid
         self.internet = False
@@ -70,6 +76,7 @@ class Main_GUI(QtWidgets.QMainWindow, qt_v2.Ui_MainWindow):
         # Hook buttons
         self.enter_button.clicked.connect(self.__sort_input)
         self.settings_button.clicked.connect(self.__open_settings)
+        self.scripting_button.clicked.connect(self.__open_scripts)
 
         # Add welcome message
         self.welcome_message.setText(welcome_message)
@@ -82,6 +89,12 @@ class Main_GUI(QtWidgets.QMainWindow, qt_v2.Ui_MainWindow):
             self.server_uid
         )
         self.settings_win.show()
+
+    def __open_scripts(self):
+        self.scripting_win = Scripting_GUI(
+            self.scripting.path
+        )
+        self.scripting_win.show()
 
     def __update_connection(self):
         while True:
@@ -158,13 +171,30 @@ class Main_GUI(QtWidgets.QMainWindow, qt_v2.Ui_MainWindow):
                     )
             else:
                 logError("Discord Integration", "Non-200 response", f"Server responded with: {resp.text}")
-
+                QMessageBox(
+                    QMessageBox.Icon.Icon.Critical,
+                    "Server Error",
+                    "Server responded with a non-200 response, see errors for more information"
+                ).exec()
         else:
-            if data == "Audio Not Recognized":
-                self.add_to_output(data)
+            # If all else fails, try scripts
+            with open(f"{self.scripting.path}\\scripts.json") as f:
+                scripts = json.load(f)
+            
+            for name, script in scripts.items():
+                if text == script["trigger"]:
+                    self.scripting.exec_script(
+                        name, input_["data"],
+                        self.add_to_output,
+                        self.internet
+                    )
+                    break
             else:
-                self.add_to_output(f"You said: {data}")
-                self.add_to_output(random.choice(self.messages["no answer"]))
+                if data == "Audio Not Recognized":
+                    self.add_to_output(data)
+                else:
+                    self.add_to_output(f"You said: {data}")
+                    self.add_to_output(random.choice(self.messages["no answer"]))
 
     def add_to_output(self, text: str = None):
         """Adds `text` to the output label, with the time and a newline
@@ -221,6 +251,10 @@ class Settings_GUI(QtWidgets.QWidget, settings_v2.Ui_Form):
         messages["welcome"].append(text)
         with open(self.settings_path+"\\messages.json", "w") as f:
             json.dump(messages, f)
+        QMessageBox(
+            QMessageBox.Icon.Information, "",
+            f"Added {text} to welcome messages"
+        ).exec()
 
     def __add_no_ans(self):
         text = self.text_entry.text()
@@ -229,6 +263,10 @@ class Settings_GUI(QtWidgets.QWidget, settings_v2.Ui_Form):
         messages["no answer"].append(text)
         with open(self.settings_path+"\\messages.json", "w") as f:
             json.dump(messages, f)
+        QMessageBox(
+            QMessageBox.Icon.Information, "",
+            f"Added {text} to no answer messages"
+        ).exec()
 
     def __add_trans(self):
         old, new = self.text_entry.text().split(":")
@@ -239,6 +277,10 @@ class Settings_GUI(QtWidgets.QWidget, settings_v2.Ui_Form):
 
         with open(self.settings_path+"\\messages.json", "w") as f:
             json.dump(translations, f)
+        QMessageBox(
+            QMessageBox.Icon.Information, "",
+            f"Added {old} -> {new} to translations"
+        ).exec()
 
     def __add_channel(self):
         id_ = self.text_entry_2.text()
@@ -249,6 +291,16 @@ class Settings_GUI(QtWidgets.QWidget, settings_v2.Ui_Form):
 
         if resp.status_code // 100 != 2:
             logError("Discord Integration", "Non-200 response", f"Server responded with: {resp.text}")
+            QMessageBox(
+                QMessageBox.Icon.Critical,
+                "Server Error",
+                "Server responded with a non-200 response, see errors for more information"
+            ).exec()
+        else:
+            QMessageBox(
+                QMessageBox.Icon.Information, "",
+                f"Added {id_} to channels"
+            ).exec()
 
     def __remove_channel(self):
         id_ = self.text_entry_2.text()
@@ -259,6 +311,16 @@ class Settings_GUI(QtWidgets.QWidget, settings_v2.Ui_Form):
 
         if resp.status_code // 100 != 2:
             logError("Discord Integration", "Non-200 response", f"Server responded with: {resp.text}")
+            QMessageBox(
+                QMessageBox.Icon.Critical,
+                "Server Error",
+                "Server responded with a non-200 response, see errors for more information"
+            ).exec()
+        else:
+            QMessageBox(
+                QMessageBox.Icon.Information, "",
+                f"Removed {id_} from channels"
+            ).exec()
     
     def __update_translations(self, mode: str):
         with open(self.settings_path+"\\translations.json") as f:
@@ -272,9 +334,18 @@ class Settings_GUI(QtWidgets.QWidget, settings_v2.Ui_Form):
 
         if resp.status_code // 100 != 2:
             logError("Translation Sync", "Non-200 response", f"Server responded with: {resp.text}")
+            QMessageBox(
+                QMessageBox.Icon.Warning,
+                "Server Error",
+                "Server responded with a non-200 response, see logs for more information"
+            ).exec()
         elif resp.status_code == 204:
             # Already up-to-date
-            pass
+            QMessageBox(
+                QMessageBox.Icon.Information,
+                "Already up-to-date",
+                f"You already have the most up-to-date translations (version: {ver})"
+            ).exec()
         else:
             new_translations = resp.json()
             if mode == "w":
@@ -295,3 +366,96 @@ class Settings_GUI(QtWidgets.QWidget, settings_v2.Ui_Form):
                             
                 with open(self.settings_path+"\\translations.json", "w") as f:
                     json.dump(translations, f)
+            QMessageBox(
+                QMessageBox.Icon.Information,
+                "Updated translations",
+                f"Translations are now up-to-date (version: {ver})"
+            ).exec()
+
+
+class Scripting_GUI(QtWidgets.QWidget, scripting_v1.Ui_Scripting_UI):
+    """Scripting UI, using pre-generated code"""
+
+    def __init__(self, storage_path: str, *args, **kwargs):
+        """Scripting UI
+
+        :param storage_path: Path to the scripting storage
+        :param *args, **kwargs: Any args to pass to super
+        """
+        super().__init__(*args, **kwargs)
+        self.setupUi(self)
+
+        self.path = storage_path
+        self.name = ""
+        self.script = None
+        with open(f"{self.path}\\scripts.json") as f:
+            self.scripts = json.load(f)
+        self.additional_types = {
+            "Response": lambda x: {"response": x},
+            "Format": lambda x: {"pattern": re.compile(x)},
+            "HTML Request": lambda x: {
+                "use input": x.lower() == "use input",
+                "url": x if not x.lower() == "use input" else None
+            },
+            "JSON Request": lambda x: {
+                "use input": x.lower() == "use input",
+                "url": x if not x.lower() == "use input" else None
+            }
+        }
+
+        # Hook buttons
+        self.select_script.clicked.connect(self.__select_script)
+        self.add_action.clicked.connect(self.__add_action)
+    
+    def __select_script(self):
+        name = self.name_entry.text()
+        if name:
+            self.script = name
+            self.label.setText(f"Scripting - {name}")
+            self.name_entry.setText("")
+
+            with open(f"{self.path}\\scripts.json") as f:
+                self.scripts = json.load(f)
+            
+            if name not in self.scripts:
+                self.scripts[name] = {
+                    "actions": []
+                }
+        else:
+            QMessageBox(
+                QMessageBox.Icon.Warning,
+                "Name Required",
+                "A name of a script is required"
+            ).exec()
+
+    def __add_action(self):
+        trigger = self.trigger_entry.text()
+        self.trigger_entry.setText("")
+        action = self.action_entry.currentText()
+        additional = self.additional_entry.text()
+        self.additional_entry.setText("")
+
+        if self.script:
+            if action and additional:
+                if trigger:
+                    self.scripts[self.script]["trigger"] = trigger
+                
+                self.scripts[self.script]["actions"].append({
+                    "type": action,
+                    **self.additional_types[action](additional)
+                })
+
+                with open(f"{self.path}\\scripts.json", "w") as f:
+                    json.dump(self.scripts, f)
+            else:
+                QMessageBox(
+                    QMessageBox.Icon.Warning,
+                    "Item missing",
+                    "Both action and additional require a value"
+                ).exec()
+        else:
+            QMessageBox(
+                QMessageBox.Icon.Warning,
+                "Missing script",
+                "A script is needed to be selected first"
+            ).exec()
