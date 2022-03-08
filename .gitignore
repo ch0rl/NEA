@@ -7,6 +7,10 @@ __pycache__/
 # Python
 pyvenv.cfg
 
+# VS things
+.vs/
+NEA.*
+
 # My notes
 notes.txt
 
