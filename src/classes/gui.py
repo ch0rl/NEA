@@ -182,9 +182,9 @@ class Main_GUI(QtWidgets.QMainWindow, qt_v2.Ui_MainWindow):
                 scripts = json.load(f)
             
             for name, script in scripts.items():
-                if text == script["trigger"]:
+                if script["trigger"] in text:
                     self.scripting.exec_script(
-                        name, input_["data"],
+                        name, text,
                         self.add_to_output,
                         self.internet
                     )

@@ -1,1 +1,25 @@
-{ "test": { "actions": [{ "type": "Response", "response": "hello world" }, { "type": "Response", "response": "this is a script test" }, { "type": "Format", "pattern": "https://[a-zA-Z0-9\\.\\-/]+" }, { "type": "HTML Request", "use input": true, "url": null }, { "type": "JSON Request", "use input": false, "url": "https://jsonplaceholder.typicode.com/posts/1" }], "trigger": "script test" } }
+{
+    "test": {
+        "actions": [
+            {
+                "type": "Response",
+                "response": "this is a script test"
+            },
+            {
+                "type": "Format",
+                "pattern": "https://[a-zA-Z0-9\\.\\-/]+"
+            },
+            {
+                "type": "HTML Request",
+                "use input": true,
+                "url": null
+            },
+            {
+                "type": "JSON Request",
+                "use input": false,
+                "url": "https://jsonplaceholder.typicode.com/posts/1"
+            }
+        ],
+        "trigger": "script test"
+    }
+}

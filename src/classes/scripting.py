@@ -40,7 +40,7 @@ class Scripting:
                 if action["type"] == "Response":
                     output(action["response"])
                 elif action["type"] == "Format":
-                    input_ = re.match(action["pattern"], input_).string
+                    input_ = re.findall(action["pattern"], input_)[0]
                 elif action["type"] == "HTML Request":
                     if internet:
                         resp = requests.get(input_ if action["use input"] else action["url"])
